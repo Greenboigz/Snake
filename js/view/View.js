@@ -47,6 +47,10 @@ class View {
     this.imageHandler.loadImage("space", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);
     this.imageHandler.loadImage("snake", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
     this.imageHandler.loadImage("token", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);
+    this.imageHandler.loadImage("snake_head", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
+    this.imageHandler.loadImage("snake_segment", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
+    this.imageHandler.loadImage("snake_corner", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
+    this.imageHandler.loadImage("snake_tail", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);
   }
 
   draw() {
@@ -73,10 +77,15 @@ class View {
     // console.log(`Protagonist: ${this.protagonist.image}`);
     var body = this.protagonist.getBody();
     for (var b = 0; b < body.length; b++) {
-      // console.log(body[b]);
-      this.imageHandler.drawImage(this.protagonist.image, (body[b].location.x + 1) * PIXELS_PER_DIV,
+      var image = "snake_head";
+      if (b == body.length - 1) {
+        image = "snake_tail";
+      } else if (b > 0) {
+        image = "snake_segment";
+      }
+      this.imageHandler.drawImage(image, (body[b].location.x + 1) * PIXELS_PER_DIV,
         (this.map.height - body[b].location.y) * PIXELS_PER_DIV,
-        this.protagonist.direction.radians);
+        body[b].direction.radians);
     }
     
   }
