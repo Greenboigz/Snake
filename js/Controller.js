@@ -113,10 +113,10 @@ function init() {
   keypadListener.getKeyListener("right").addKeyDownEvent(callDownEast);
   keypadListener.getKeyListener("down").addKeyDownEvent(callDownSouth);
   keypadListener.getKeyListener("left").addKeyDownEvent(callDownWest);
-  keypadListener.getKeyListener("up").addKeyUpEvent(callUpNorth);
-  keypadListener.getKeyListener("right").addKeyUpEvent(callUpEast);
-  keypadListener.getKeyListener("down").addKeyUpEvent(callUpSouth);
-  keypadListener.getKeyListener("left").addKeyUpEvent(callUpWest);
+  // keypadListener.getKeyListener("up").addKeyUpEvent(callUpNorth);
+  // keypadListener.getKeyListener("right").addKeyUpEvent(callUpEast);
+  // keypadListener.getKeyListener("down").addKeyUpEvent(callUpSouth);
+  // keypadListener.getKeyListener("left").addKeyUpEvent(callUpWest);
 }
 
 function callDownNorth() {

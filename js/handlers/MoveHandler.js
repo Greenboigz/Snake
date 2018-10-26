@@ -39,8 +39,16 @@ class MoveHandler {
     if (this.contains(direction)) {
       this.remove(direction);
     } else {
-      throw "MoveHandler already contains the direction, " + direction.toString();
+      throw "MoveHandler does not contain the direction, " + direction.toString();
     }
+  }
+
+  /**
+   * Releases the top most direction
+   */
+  pop() {
+    if (this.presses.length > 0)
+      this.remove(this.presses[0]);
   }
 
   /**

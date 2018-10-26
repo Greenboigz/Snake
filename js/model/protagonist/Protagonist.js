@@ -42,7 +42,7 @@ class Protagonist {
   move() {
     this.consume();
     // console.log(`Snake: ${this.location.toString()} - ${this.direction.toString()}`);
-    if (this._alive) {
+    if (this.isAlive()) {
       var newLoc = Vector.add(this._gridLoc, this.unit_step);
       if (this._grid.getTile(newLoc.x, newLoc.y).isTraversible()) {
         this._loc = Vector.add(this._loc, this.step);
@@ -52,9 +52,10 @@ class Protagonist {
           if (!Direction.compare(this._moves.direction, Direction.NONE())) {
             this._direction = this._moves.direction;
           }
+          this._moves.pop();
         }
       } else {
-        this._alive = false;
+        this.die();
       }
     }
   }

@@ -78,7 +78,8 @@ class View {
     var body = this.protagonist.getBody();
     for (var b = 0; b < body.length; b++) {
       var image = "snake_head";
-      if (b == body.length - 1) {
+      var rotation = undefined;
+      if (b == this.protagonist.length - 1) {
         image = "snake_tail";
       } else if (b > 0) {
         image = "snake_segment";
@@ -86,8 +87,34 @@ class View {
       this.imageHandler.drawImage(image, (body[b].location.x + 1) * PIXELS_PER_DIV,
         (this.map.height - body[b].location.y) * PIXELS_PER_DIV,
         body[b].direction.radians);
+      if (b > 0 && !Direction.compare(body[b].direction, body[b-1].direction)) {
+        if (!Direction.compare(body[b].getCornerRotation(body[b-1].direction), Direction.NONE())) {
+          rotation = body[b].getCornerRotation(body[b-1].direction).radians;
+        }
+      }
+      if (rotation != undefined) {
+        var loc = Vector.add(body[b].gridLocation, body[b].direction.toVector());
+        this.clearTile(loc);
+        this.imageHandler.drawImage("snake_corner", (loc.x + 1) * PIXELS_PER_DIV,
+          (this.map.height - loc.y) * PIXELS_PER_DIV,
+          rotation);
+      }
     }
-    
+    if (this.protagonist.isGrowing() && body.length < this.protagonist.length) {
+      var loc = body[body.length - 1].gridLocation;
+      this.clearTile(loc);
+      this.imageHandler.drawImage("snake_tail", (loc.x + 1) * PIXELS_PER_DIV,
+        (this.map.height - loc.y) * PIXELS_PER_DIV,
+        body[body.length - 1].direction.radians);
+    }
+  }
+
+  clearTile(location) {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect((location.x + 1) * PIXELS_PER_DIV, (this.map.height - location.y) * PIXELS_PER_DIV,
+      PIXELS_PER_DIV, PIXELS_PER_DIV);
+    this.ctx.stroke();
   }
 
   drawBorder() {
