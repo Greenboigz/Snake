@@ -6,8 +6,8 @@ class Snake extends Protagonist {
     constructor(grid) {
         super(Math.floor(grid.width / 2), Math.floor(grid.height / 2), grid);
 
-        this._prev_length = 1;
-        this._length = 200;
+        this._prev_points = 1;
+        this._points = 2;
         this._body = [new SnakeSegment(this.location, this.gridLocation, this.direction)];
     }
 
@@ -16,7 +16,6 @@ class Snake extends Protagonist {
      */
     consume() {
         super.consume();
-        // this._body.push(this.gridLocation);
     }
 
     /**
@@ -24,25 +23,36 @@ class Snake extends Protagonist {
      */
     move() {
         if (this.isAlive()) {
-            this._prev_length = this._body.length;
+            this._prev_points = this._body.length;
             this._body.reverse().push(new SnakeSegment(this.location, this.gridLocation, this.direction));
             this._body.reverse();
-            if (this._body.length > this._length * DIV_SIZE) {
+            if (this._body.length > this._points * DIV_SIZE) {
                 this._body.pop();
             }
         }
         super.move();
         var head = Vector.add(this.gridLocation, this.direction.toVector());
-        for (var b = DIV_SIZE; b < this._body.length; b += DIV_SIZE) {
-            if (Vector.compare(this._body[b].gridLocation, head)) {
-                this.die();
-                break;
-            }
+        if (this.containsTile(head)) {
+            this.die();
         }
     }
 
+    /**
+     * Checks if the snake contains the tile
+     * @param {Vector} loc 
+     * @return {Boolean}
+     */
+    containsTile(loc) {
+        for (var b = DIV_SIZE; b < this._body.length; b += DIV_SIZE) {
+            if (Vector.compare(this._body[b].gridLocation, loc, 0.001)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     isGrowing() {
-        return this._prev_length < this._body.length;
+        return this._prev_points < this._body.length;
     }
 
     /**
@@ -67,7 +77,7 @@ class Snake extends Protagonist {
     }
 
     get length() {
-        return this._length;
+        return this._points;
     }
 
 }

@@ -1,11 +1,11 @@
-var map, protagonist, view, keypadListener, loaded = 0;
-var INIT_RELOAD = 500, RELOAD = 5, DIV_SIZE = 8, PIXELS_PER_DIV = 16;
+var map, snake, view, keypadListener, loaded = 0;
+var INIT_RELOAD = 1000, RELOAD = 6, DIV_SIZE = 8, PIXELS_PER_DIV = 20;
 var GRID_DIM = 25;
 
 var handlerIncludes = ["js/handlers/KeypadListener.js", "js/handlers/MoveHandler.js"];
-var mathIncludes = ["js/math/Direction.js", "js/math/Vector.js"];
-var modelIncludes = ["js/model/items/Item.js", "js/model/map/Tile.js", 
-  "js/model/map/Map.js", "js/model/protagonist/Protagonist.js", 
+var mathIncludes = ["js/math/Random.js", "js/math/Direction.js", "js/math/Vector.js"];
+var modelIncludes = ["js/model/items/Item.js", "js/model/items/Fruit.js", 
+  "js/model/map/Tile.js", "js/model/map/Map.js", "js/model/protagonist/Protagonist.js", 
   "js/model/protagonist/Snake.js"];
 var viewIncludes = ["js/view/ImageHandler.js", "js/view/View.js"];
 
@@ -102,10 +102,11 @@ function print(param) {
  */
 function init() {
   map = new BaseMap(GRID_DIM, GRID_DIM);
-  protagonist = new Snake(map);
-  map._protagonist = protagonist;
+  snake = new Snake(map);
+  map._protagonist = snake;
   view = new View(this.map);
   view.local = false;
+  setFruit();
 
   keypadListener = new KeypadListener();
 
@@ -119,47 +120,62 @@ function init() {
   // keypadListener.getKeyListener("left").addKeyUpEvent(callUpWest);
 }
 
+function setFruit() {
+  var tile;
+  while (!tile) {
+    tile = map.randomTile();
+    if (snake.containsTile(tile.location)) {
+      tile = null;
+    }
+  }
+  var fruit = new Fruit();
+  fruit.onConsume = setFruit;
+  map.getTile(tile.location.x, tile.location.y).item = fruit;
+}
+
 function callDownNorth() {
-  protagonist.turn(Direction.NORTH());
+  snake.turn(Direction.NORTH());
 }
 
 function callDownEast() {
-  protagonist.turn(Direction.EAST());
+  snake.turn(Direction.EAST());
 }
 
 function callDownSouth() {
-  protagonist.turn(Direction.SOUTH());
+  snake.turn(Direction.SOUTH());
 }
 
 function callDownWest() {
-  protagonist.turn(Direction.WEST());
+  snake.turn(Direction.WEST());
 }
 
 function callUpNorth() {
-  protagonist.unturn(Direction.NORTH());
+  snake.unturn(Direction.NORTH());
 }
 
 function callUpEast() {
-  protagonist.unturn(Direction.EAST());
+  snake.unturn(Direction.EAST());
 }
 
 function callUpSouth() {
-  protagonist.unturn(Direction.SOUTH());
+  snake.unturn(Direction.SOUTH());
 }
 
 function callUpWest() {
-  protagonist.unturn(Direction.WEST());
+  snake.unturn(Direction.WEST());
 }
 
 function repeat() {
   //document.getElementById("divGameStage").innerHTML = map.toString();
-  view.draw();
-  modelRepeat();
+  if (snake.isAlive()) {
+    view.draw();
+    modelRepeat();
+  }
   setTimeout(repeat, RELOAD);
 }
 
 function modelRepeat() {
-  protagonist.move();
+  snake.move();
 }
 
 load_files();

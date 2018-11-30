@@ -51,6 +51,7 @@ class View {
     this.imageHandler.loadImage("snake_segment", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
     this.imageHandler.loadImage("snake_corner", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);    
     this.imageHandler.loadImage("snake_tail", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);
+    this.imageHandler.loadImage("apple", 1, PIXELS_PER_DIV, PIXELS_PER_DIV);
   }
 
   draw() {

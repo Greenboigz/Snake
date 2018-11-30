@@ -10,6 +10,7 @@ class Item {
     this._pointValue = points;
     this._image = image;
     this._string = string;
+    this._onConsume = () => {};
   }
 
   /**
@@ -37,21 +38,25 @@ class Item {
   }
 
   /**
+   * Called when the item is consumed
+   */
+  consume() {
+    return this._onConsume();
+  }
+
+  /**
+   * Sets the consume function of the fruit
+   * @param {function} func
+   */
+  set onConsume(func) {
+    this._onConsume = func;
+  }
+
+  /**
    * Copies the item object to a new instance
    */
   copy() {
     return new Item(points, image, string);
-  }
-
-}
-
-class Token extends Item {
-
-  /**
-   * Builds the token object
-   */
-  constructor() {
-    super(1, "token", "t");
   }
 
 }

@@ -67,11 +67,8 @@ class Protagonist {
     var tile = this.tile;
     if (tile.hasItem()) {
       var item = tile.removeItem();
+      item.consume();
       this._points += item.points;
-      this._coins += item.coins;
-      if (item.isKey()) {
-        this._keys.push(item);
-      }
     }
   }
 

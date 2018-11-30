@@ -172,4 +172,8 @@ class BaseMap extends Map {
     }
   }
 
+  randomTile() {
+    return this.getTile(1+getRandomInt(this.width-2), 1+getRandomInt(this.height-2));
+  }
+
 }
