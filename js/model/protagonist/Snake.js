@@ -7,15 +7,12 @@ class Snake extends Protagonist {
         super(Math.floor(grid.width / 2), Math.floor(grid.height / 2), grid);
 
         this._prev_points = 1;
-        this._points = 2;
+        this._points = 3;
         this._body = [new SnakeSegment(this.location, this.gridLocation, this.direction)];
     }
 
-    /**
-     * Consumes the item on the tile if the tile contains an item
-     */
-    consume() {
-        super.consume();
+    isAlive() {
+        return super.isAlive();
     }
 
     /**
@@ -23,15 +20,15 @@ class Snake extends Protagonist {
      */
     move() {
         if (this.isAlive()) {
-            this._prev_points = this._body.length;
+            this._prev_points = Math.ceil(this._body.length / DIV_SIZE);
             this._body.reverse().push(new SnakeSegment(this.location, this.gridLocation, this.direction));
             this._body.reverse();
-            if (this._body.length > this._points * DIV_SIZE) {
+            if (this._body.length > (this._points - 1) * DIV_SIZE + 1) {
                 this._body.pop();
             }
         }
-        super.move();
         var head = Vector.add(this.gridLocation, this.direction.toVector());
+        super.move();
         if (this.containsTile(head)) {
             this.die();
         }
@@ -43,7 +40,7 @@ class Snake extends Protagonist {
      * @return {Boolean}
      */
     containsTile(loc) {
-        for (var b = DIV_SIZE; b < this._body.length; b += DIV_SIZE) {
+        for (var b = DIV_SIZE; b < this._body.length - DIV_SIZE; b += DIV_SIZE) {
             if (Vector.compare(this._body[b].gridLocation, loc, 0.001)) {
                 return true;
             }
@@ -52,7 +49,7 @@ class Snake extends Protagonist {
     }
 
     isGrowing() {
-        return this._prev_points < this._body.length;
+        return this._prev_points < this._points;
     }
 
     /**
@@ -78,6 +75,10 @@ class Snake extends Protagonist {
 
     get length() {
         return this._points;
+    }
+
+    get points() {
+        return (this._points - 3) / 3;
     }
 
 }
@@ -119,30 +120,30 @@ class SnakeSegment {
     getCornerRotation(nextDirection) {
         if (Direction.compare(this.direction, Direction.NORTH())) {
             if (Direction.compare(nextDirection, Direction.EAST())) {
-                return Direction.EAST();
+                return [Direction.EAST(), 1];
             } else if (Direction.compare(nextDirection, Direction.WEST())) {
-                return Direction.SOUTH();
+                return [Direction.SOUTH(), -1];
             }
         } else if (Direction.compare(this.direction, Direction.EAST())) {
             if (Direction.compare(nextDirection, Direction.NORTH())) {
-                return Direction.WEST();
+                return [Direction.WEST(), -1];
             } else if (Direction.compare(nextDirection, Direction.SOUTH())) {
-                return Direction.SOUTH();
+                return [Direction.SOUTH(), 1];
             }
         } else if (Direction.compare(this.direction, Direction.SOUTH())) {
             if (Direction.compare(nextDirection, Direction.EAST())) {
-                return Direction.NORTH();
+                return [Direction.NORTH(), -1];
             } else if (Direction.compare(nextDirection, Direction.WEST())) {
-                return Direction.WEST();
+                return [Direction.WEST(), 1];
             }
         } else if (Direction.compare(this.direction, Direction.WEST())) {
             if (Direction.compare(nextDirection, Direction.NORTH())) {
-                return Direction.NORTH();
+                return [Direction.NORTH(), 1];
             } else if (Direction.compare(nextDirection, Direction.SOUTH())) {
-                return Direction.EAST();
+                return [Direction.EAST(), -1];
             }
         }
-        return Direction.NONE();
+        return [Direction.NONE(), 0];
     }
 
 }

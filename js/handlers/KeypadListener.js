@@ -1,4 +1,5 @@
 var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40;
+var A = 65, W = 87, D = 68, S = 83;
 var TESTING = false;
 var CTRL = -1;
 var SHIFT = -2;
@@ -149,6 +150,10 @@ class KeypadListener extends KeyHandler {
     this.addKeyListener("up", UP);
     this.addKeyListener("right", RIGHT);
     this.addKeyListener("down", DOWN);
+    this.addKeyListener("a", A);
+    this.addKeyListener("s", S);
+    this.addKeyListener("d", D);
+    this.addKeyListener("w", W);
   }
 
 }

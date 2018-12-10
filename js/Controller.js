@@ -1,13 +1,13 @@
-var map, snake, view, keypadListener, loaded = 0;
-var INIT_RELOAD = 1000, RELOAD = 6, DIV_SIZE = 8, PIXELS_PER_DIV = 20;
-var GRID_DIM = 25;
+var map, snake, timer, view, keypadListener, loaded = 0;
+var INIT_RELOAD = 5000, RELOAD = 12, DIV_SIZE = 8, PIXELS_PER_DIV = 32;
+var GRID_DIM = 15;
 
 var handlerIncludes = ["js/handlers/KeypadListener.js", "js/handlers/MoveHandler.js"];
-var mathIncludes = ["js/math/Random.js", "js/math/Direction.js", "js/math/Vector.js"];
+var mathIncludes = ["js/math/Random.js", "js/math/Direction.js", "js/math/Vector.js", "js/math/Timer.js"];
 var modelIncludes = ["js/model/items/Item.js", "js/model/items/Fruit.js", 
   "js/model/map/Tile.js", "js/model/map/Map.js", "js/model/protagonist/Protagonist.js", 
   "js/model/protagonist/Snake.js"];
-var viewIncludes = ["js/view/ImageHandler.js", "js/view/View.js"];
+var viewIncludes = ["js/view/ImageHandler.js", "js/view/View.js", "js/view/Fence.js"];
 
 var includes = [];
 includes = includes.concat(handlerIncludes);
@@ -29,7 +29,7 @@ function loadScript(url, callback) {
 
   // Then bind the event to the callback function.
   // There are several events for cross browser compatibility.
-  script.onreadystatechange = callback;
+  // script.onreadystatechange = callback;
   script.onload = callback;
   script.async = false;
 
@@ -104,7 +104,10 @@ function init() {
   map = new BaseMap(GRID_DIM, GRID_DIM);
   snake = new Snake(map);
   map._protagonist = snake;
-  view = new View(this.map);
+  timer = new Timer();
+  snake.onDie = () => { timer.stop() };
+  timer.start();
+  view = new View(map, timer);
   view.local = false;
   setFruit();
 
@@ -114,6 +117,10 @@ function init() {
   keypadListener.getKeyListener("right").addKeyDownEvent(callDownEast);
   keypadListener.getKeyListener("down").addKeyDownEvent(callDownSouth);
   keypadListener.getKeyListener("left").addKeyDownEvent(callDownWest);
+  keypadListener.getKeyListener("w").addKeyDownEvent(callDownNorth);
+  keypadListener.getKeyListener("d").addKeyDownEvent(callDownEast);
+  keypadListener.getKeyListener("s").addKeyDownEvent(callDownSouth);
+  keypadListener.getKeyListener("a").addKeyDownEvent(callDownWest);
   // keypadListener.getKeyListener("up").addKeyUpEvent(callUpNorth);
   // keypadListener.getKeyListener("right").addKeyUpEvent(callUpEast);
   // keypadListener.getKeyListener("down").addKeyUpEvent(callUpSouth);
@@ -167,10 +174,8 @@ function callUpWest() {
 
 function repeat() {
   //document.getElementById("divGameStage").innerHTML = map.toString();
-  if (snake.isAlive()) {
-    view.draw();
-    modelRepeat();
-  }
+  view.draw();
+  modelRepeat();
   setTimeout(repeat, RELOAD);
 }
 

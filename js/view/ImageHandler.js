@@ -8,9 +8,13 @@ class ImageHandler {
   /**
    * Loads an individual image
    * @param {string} name
+   * @param {number} period seconds per art cycle
+   * @param {number} width
+   * @param {number} height
+   * @param {boolean} repeat
    */
-  loadImage(name, period, width, height) {
-    this._images[name] = new Image(name, period, this.context, width, height);
+  loadImage(name, period, width, height, repeat) {
+    this._images[name] = new Image(name, period, this.context, width, height, repeat);
   }
 
   /**
@@ -35,7 +39,7 @@ class ImageHandler {
    */
   drawImage(name, x, y, angle) {
     if (name in this._images) {
-      this._images[name].draw(x, y, angle);
+      this._images[name].draw(x, SCOREBOARD_DIVS_HEIGHT * PIXELS_PER_DIV + y, angle);
     } else {
       throw "Image {" + name + "} not contained in ImageHandler";
     }
@@ -82,16 +86,19 @@ class Image {
    * @param {Context} context
    * @param {number} width
    * @param {number} height
+   * @param {boolean} repeat
    */
-  constructor(name, period, context, width, height) {
+  constructor(name, period, context, width, height, repeat = true) {
     this._name = name;
     this._element = document.getElementById(name);
+    if (this._element == null) throw `Image element ${name} not found.`;
     this.period = period;
     this.context = context;
     this.width = width;
     this.height = height;
+    this.repeat = repeat;
     this.swidth = this._element.width;
-    this.sheight = this._element.width;
+    this.sheight = (repeat) ? this._element.width : this._element.height;
     this.spriteLength = this._element.height / this._element.width;
   }
 
@@ -107,7 +114,7 @@ class Image {
    * @param {number} angle
    */
   draw(x, y, angle) {
-    if (this.spriteLength > 1) {
+    if (repeat && this.spriteLength > 1) {
       var time = (new Date()).getTime() % (1000 * this.period);
       var loc = Math.floor(this.spriteLength * time / (this.period*1000));
       if (angle != 0) {
@@ -145,7 +152,7 @@ class Image {
    * @param {number} stime (ms)
    */
   drawSprite(x, y, angle, stime) {
-    if (this.spriteLength > 1) {
+    if (repeat && this.spriteLength > 1) {
       var time = stime % (1000 * this.period);
       var loc = Math.floor(this.spriteLength * time / (this.period*1000));
       if (angle != 0) {

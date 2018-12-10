@@ -84,7 +84,7 @@ class MoveHandler {
         removed = true;
       }
     }
-    if (!removed) {
+    if (TESTING && !removed) {
       throw "MoveHandler does not contain the direction " + direction.toString();
     }
   }

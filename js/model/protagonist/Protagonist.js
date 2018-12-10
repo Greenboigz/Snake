@@ -18,6 +18,7 @@ class Protagonist {
     this._points = 0;
     this._moves = new MoveHandler();
     this._keys = [];
+    this._onDie = () => {};
   }
 
   /**
@@ -49,7 +50,7 @@ class Protagonist {
         if (!this.isBetween()) {
           this._loc = Vector.round(this._loc);
           this._gridLoc = Vector.round(this._loc);
-          if (!Direction.compare(this._moves.direction, Direction.NONE())) {
+          if (!Direction.compare(this._moves.direction, Direction.NONE()) && !Direction.compare(this._moves.direction, this._direction.opposite)) {
             this._direction = this._moves.direction;
           }
           this._moves.pop();
@@ -97,6 +98,14 @@ class Protagonist {
   }
 
   /**
+   * Gets the points of the protagonist
+   * @return {Number}
+   */
+  get points() {
+    return this._points
+  }
+
+  /**
    * Gets the speed of the protagonist
    * @return {Number}
    */
@@ -118,6 +127,10 @@ class Protagonist {
    */
   get center() {
     return Vector.add(this._loc, new Vector(0.5, 0.5));
+  }
+
+  set onDie(onDie) {
+    this._onDie = onDie;
   }
 
   /**
@@ -248,6 +261,7 @@ class Protagonist {
     */
    die() {
      this._alive = false;
+     this._onDie();
    }
 
   /**
