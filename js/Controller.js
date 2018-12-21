@@ -1,12 +1,12 @@
-var map, snake, timer, view, keypadListener, loaded = 0;
+var map, snake, item, timer, view, keypadListener, loaded = 0;
 var INIT_RELOAD = 5000, RELOAD = 12, DIV_SIZE = 8, PIXELS_PER_DIV = 32;
 var GRID_DIM = 15;
 
 var handlerIncludes = ["js/handlers/KeypadListener.js", "js/handlers/MoveHandler.js"];
 var mathIncludes = ["js/math/Random.js", "js/math/Direction.js", "js/math/Vector.js", "js/math/Timer.js"];
-var modelIncludes = ["js/model/items/Item.js", "js/model/items/Fruit.js", 
+var modelIncludes = ["js/model/map/Placeable.js", "js/model/items/Item.js", "js/model/items/Fruit.js", 
   "js/model/map/Tile.js", "js/model/map/Map.js", "js/model/protagonist/Protagonist.js", 
-  "js/model/protagonist/Snake.js"];
+  "js/model/items/Mouse.js","js/model/protagonist/Snake.js"];
 var viewIncludes = ["js/view/ImageHandler.js", "js/view/View.js", "js/view/Fence.js"];
 
 var includes = [];
@@ -109,7 +109,7 @@ function init() {
   timer.start();
   view = new View(map, timer);
   view.local = false;
-  setFruit();
+  setItem();
 
   keypadListener = new KeypadListener();
 
@@ -127,7 +127,7 @@ function init() {
   // keypadListener.getKeyListener("left").addKeyUpEvent(callUpWest);
 }
 
-function setFruit() {
+function setItem() {
   var tile;
   while (!tile) {
     tile = map.randomTile();
@@ -135,9 +135,26 @@ function setFruit() {
       tile = null;
     }
   }
-  var fruit = new Fruit();
-  fruit.onConsume = setFruit;
-  map.getTile(tile.location.x, tile.location.y).item = fruit;
+  var direction = Direction.EAST();
+  var randInt = Math.floor(Math.random() * 4);
+  switch (randInt) {
+    case 0:
+      direction = Direction.NORTH();
+      break;
+    case 1:
+      direction = Direction.EAST();
+      break;
+    case 2:
+      direction = Direction.SOUTH();
+      break;
+    case 3:
+      direction = Direction.WEST();
+      break;
+  }
+
+  item = new Mouse(map, tile.location, direction);
+  item.onConsume = setItem;
+  map.getTile(tile.location.x, tile.location.y).item = item;
 }
 
 function callDownNorth() {
@@ -181,6 +198,7 @@ function repeat() {
 
 function modelRepeat() {
   snake.move();
+  item.move();
 }
 
 load_files();

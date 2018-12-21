@@ -27,6 +27,9 @@ class View {
     this.count = 0;
     this.tail_direction = Direction.EAST();
 
+    this._tilesDrawn = [];
+    this._prevTilesDrawn = [];
+
     this.timer = timer;
   }
 
@@ -101,7 +104,6 @@ class View {
     this.drawScoreboard();
     this.drawMap();
     this.drawProtagonist();
-    // this.drawBorder();
     this.count++;
   }
 
@@ -144,16 +146,11 @@ class View {
       SCOREBOARD_X_OFFSET + (NUMBER_WIDTH + NUMBER_SEPARATION) * 3, 
       SCOREBOARD_Y_OFFSET - SCOREBOARD_DIVS_HEIGHT * PIXELS_PER_DIV,
       0);
-    // this.imageHandler.drawImage(
-    //   "scoreboard-" + Math.floor((this.protagonist.points % 10)), 
-    //   SCOREBOARD_X_OFFSET + (NUMBER_WIDTH + NUMBER_SEPARATION) * 4, 
-    //   SCOREBOARD_Y_OFFSET - SCOREBOARD_DIVS_HEIGHT * PIXELS_PER_DIV,
-    //   0); 
     
     var time = this.timer.getTime();
     var minutes = Math.floor(time / 60);
     var seconds = Math.floor(time % 60);
-    var milliseconds = time - Math.floor(time);
+    // var milliseconds = time - Math.floor(time);
 
     this.imageHandler.drawImage(
       "scoreboard-" + Math.floor( minutes / 10), 
@@ -176,11 +173,6 @@ class View {
       (this.map.width - SCOREBOARD_DIVS_WIDTH) * PIXELS_PER_DIV + SCOREBOARD_X_OFFSET + (NUMBER_WIDTH + NUMBER_SEPARATION) * 3, 
       SCOREBOARD_Y_OFFSET - SCOREBOARD_DIVS_HEIGHT * PIXELS_PER_DIV,
       0);
-    // this.imageHandler.drawImage(
-    //   "scoreboard-" + Math.floor(milliseconds * 10) % 10, 
-    //   (this.map.width - SCOREBOARD_DIVS_WIDTH) * PIXELS_PER_DIV + SCOREBOARD_X_OFFSET + (NUMBER_WIDTH + NUMBER_SEPARATION) * 4, 
-    //   SCOREBOARD_Y_OFFSET - SCOREBOARD_DIVS_HEIGHT * PIXELS_PER_DIV,
-    //   0); 
   }
 
   /**
@@ -205,8 +197,6 @@ class View {
       } else if (b > 0) {
         image = "snake_2_segment";
       }
-      // this.imageHandler.drawImage(image, (body[b].location.x + 1) * PIXELS_PER_DIV,
-      //   (this.map.height - body[b].location.y) * PIXELS_PER_DIV, body[b].direction.radians);
       this.drawSegment(image, body[b].location, body[b].direction);
       if (this.isCornerSegment(b)) {
         var corner = body[b].getCornerRotation(body[b-1].direction);
@@ -218,16 +208,8 @@ class View {
         this.drawTile(loc.x, loc.y);
         if (this.protagonist.isAlive()) {
           this.drawSegment(turn < 0 ? "snake_2_corner_left_moving" : "snake_2_corner_right_moving", loc, rotation);
-          // this.imageHandler.drawImage(turn < 0 ? "snake_2_corner_left_moving" : "snake_2_corner_right_moving" , 
-          //   loc.x * PIXELS_PER_DIV,
-          //   (this.map.height - loc.y - 1) * PIXELS_PER_DIV,
-          //   rotation);
         } else {
           this.drawSegment(turn < 0 ? "snake_2_corner_left" : "snake_2_corner_right", loc, rotation);
-          // this.imageHandler.drawImage(turn < 0 ? "snake_2_corner_left" : "snake_2_corner_right" , 
-          //   loc.x * PIXELS_PER_DIV,
-          //   (this.map.height - loc.y - 1) * PIXELS_PER_DIV,
-          //   rotation);
         }
       }
     }
@@ -235,9 +217,6 @@ class View {
       var loc = body[body.length - 1].gridLocation;
       this.drawTile(loc.x, loc.y);
       this.drawSegment("snake_2_tail", loc, body[body.length - 1].direction);
-      // this.imageHandler.drawImage("snake_2_tail", loc.x * PIXELS_PER_DIV,
-      //   (this.map.height - loc.y - 1) * PIXELS_PER_DIV,
-      //   body[body.length - 1].direction.radians);
     }
   }
 
@@ -272,6 +251,8 @@ class View {
    */
   drawMap() {
     var x, y;
+    this._prevTilesDrawn = this._tilesDrawn;
+    this._tilesDrawn = [];
     for (x = 0; x < this.map.width; x++) {
       for (y = 0; y < this.map.height; y++) {
         var tile = this.map.getTile(x,y);
@@ -280,13 +261,25 @@ class View {
         }
       }
     }
+    for (var t = 0; t < this._prevTilesDrawn.length; t++) {
+      this.drawTile(this._prevTilesDrawn[t].x, this._prevTilesDrawn[t].y, false);
+    }
   }
 
-  drawTile(x,y) {
+  drawTile(x, y, recurse = true) {
     var tile = this.map.getTile(x,y);
+    this._tilesDrawn.push(tile.gridLocation);
     var image = this.getImage(x,y);
     this.imageHandler.drawImage(image, x * PIXELS_PER_DIV, (this.map.height - y - 1) * PIXELS_PER_DIV, 0);
-    if (tile.hasItem()) this.imageHandler.drawImage(tile.item.image, x * PIXELS_PER_DIV, (this.map.height - y - 1) * PIXELS_PER_DIV, 0);
+    if (tile.hasItem() && recurse) {
+      this.drawTile(tile.item.front.x, tile.item.front.y, false);
+      this.drawTile(tile.item.back.x, tile.item.back.y, false);
+      this.imageHandler.drawImage(
+        tile.item.image, 
+        tile.item.location.x * PIXELS_PER_DIV, 
+        (this.map.height - tile.item.location.y - 1) * PIXELS_PER_DIV, 
+        tile.item.direction.radians);
+    }
   }
 
   drawSegment(image, loc, direction) {

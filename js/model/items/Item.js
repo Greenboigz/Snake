@@ -1,4 +1,4 @@
-class Item {
+class Item extends Placeable {
 
   /**
    * Builds the item object
@@ -6,10 +6,13 @@ class Item {
    * @param {string} image
    * @param {string} string
    */
-  constructor(points, image, string) {
+  constructor(map, location, direction, speed, points, image, string) {
+    super(map, location, direction, speed);
+    
     this._pointValue = points;
     this._image = image;
-    this._string = string;
+    this._string = string; 
+
     this._onConsume = () => {};
   }
 

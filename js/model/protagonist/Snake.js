@@ -29,9 +29,6 @@ class Snake extends Protagonist {
         }
         var head = Vector.add(this.gridLocation, this.direction.toVector());
         super.move();
-        if (this.containsTile(head)) {
-            this.die();
-        }
     }
 
     /**

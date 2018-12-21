@@ -10,6 +10,7 @@ class Map {
     this._height = height;
     this._grid = [];
     this._protagonist = null;
+    this._enemies = [];
 
     this.buildGrid();
   }
@@ -26,6 +27,10 @@ class Map {
     return this._protagonist;
   }
 
+  get enemies() {
+    return this._enemies;
+  }
+
   /**
    * Gets the tile at the given location
    * @param {number} x
@@ -37,7 +42,7 @@ class Map {
       if (x >= 0 && x < this._width && y >= 0 && y < this._height) {
         return this._grid[y][x];
       } else {
-        return new Space(x,y);
+        return new Space(x, y, this);
       }
     }
     throw "x and y coordinates must be integers - " + "{" + x + "," + y + "}";
@@ -55,13 +60,21 @@ class Map {
   }
 
   /**
+   * Adds the enemy to the list of enemies
+   * @param {Enemy} enemy
+   */
+  addEnemy(enemy) {
+    this._enemies.push(enemy);
+  }
+
+  /**
    * Builds the grid of the Map
    */
   buildGrid() {
     for (var y = 0; y < this._height; y++) {
       this._grid.push([]);
       for (var x = 0; x < this._width; x++) {
-        this._grid[y].push(new Wall(x, y));
+        this._grid[y].push(new Wall(x, y, this));
       }
     }
   }
@@ -167,7 +180,7 @@ class BaseMap extends Map {
   clearInit() {
     for (var x = 1; x < this._width - 1; x++) {
       for (var y = 1; y < this._height - 1; y++) {
-        this.setTile(new Space(x,y));
+        this.setTile(new Space(x, y, this));
       }
     }
   }

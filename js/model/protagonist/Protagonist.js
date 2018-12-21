@@ -45,7 +45,7 @@ class Protagonist {
     // console.log(`Snake: ${this.location.toString()} - ${this.direction.toString()}`);
     if (this.isAlive()) {
       var newLoc = Vector.add(this._gridLoc, this.unit_step);
-      if (this._grid.getTile(newLoc.x, newLoc.y).isTraversible()) {
+      if (this._grid.getTile(newLoc.x, newLoc.y).isTraversible() && !this._grid.getTile(newLoc.x, newLoc.y).containsProtagonist()) {
         this._loc = Vector.add(this._loc, this.step);
         if (!this.isBetween()) {
           this._loc = Vector.round(this._loc);

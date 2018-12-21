@@ -9,15 +9,23 @@ class Tile {
    * @param {number} type
    * @param {string} string
    * @param {string} image
+   * @param {Map} map
    */
-  constructor(x, y, type, string, image) {
+  constructor(x, y, type, string, image, map) {
     this._loc = new Vector(x,y);
     this._type = type;
     this._string = string;
     this._image = image;
+    this._snake = snake;
+    this._grid = map;
+
+    if (!this._grid) {
+      throw "Map must be defined";
+    }
 
     this._item = null;
     this._hasItem = false;
+    this._hadItem = false;
     this._storable = false;
     this._traversible = false;
 
@@ -45,7 +53,7 @@ class Tile {
    * @return {Vector}
    */
   get location() {
-    return new Vector(this._loc.x, this._loc.y)
+    return this._loc.copy();
   }
 
   /**
@@ -108,6 +116,7 @@ class Tile {
     if (this.isStorable() && !this._hasItem && item != null) {
       this._item = item;
       this._hasItem = true;
+      this._hadItem = true;
     } else if (!this.isStorable()) {
       throw "This tile cannot store items";
     }
@@ -135,6 +144,13 @@ class Tile {
   }
 
   /**
+   * Checks if the tile had an item
+   */
+  hadItem() {
+    return this._hadItem;
+  }
+
+  /**
    * Checks if the tile can store items
    * @return {boolean}
    */
@@ -148,6 +164,15 @@ class Tile {
    */
    isTraversible() {
      return this._traversible;
+   }
+
+   /**
+    * Checks if the tile has the snake
+    * @return {boolean}
+    */
+   containsProtagonist() {
+      if (this._grid)
+        return this._grid.protagonist.containsTile(this.location);
    }
 
    /**
@@ -206,9 +231,10 @@ class Wall extends Tile {
    * Wall class representing the tile object that holds location value
    * @param {number} x
    * @param {number} y
+   * @param {Map} map
    */
-  constructor(x, y) {
-    super(x, y, 0, "w", "wall");
+  constructor(x, y, map) {
+    super(x, y, 0, "w", "wall", map);
   }
 
 }
@@ -219,9 +245,10 @@ class Space extends Tile {
    * Space class representing the tile object that holds location value
    * @param {number} x
    * @param {number} y
+   * @param {Map} map
    */
-  constructor(x, y) {
-    super(x, y, 1, " ", "space");
+  constructor(x, y, map) {
+    super(x, y, 1, " ", "space", map);
     this._traversible = true;
     this._storable = true;
   }
